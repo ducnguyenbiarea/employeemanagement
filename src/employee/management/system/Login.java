@@ -50,26 +50,46 @@ public class Login extends JFrame implements ActionListener{
          setVisible(true);
     }
      
-     @Override
-     public void actionPerformed(ActionEvent ae){
-         try{
-             String username = tfusername.getText();
-             String password = tfpassword.getText();
-             Conn c = new Conn();
-             String query = "select * from login where username =  '"+username+"' and password = '"+password+"'";
-             ResultSet rs = c.s.executeQuery(query);
-             if(rs.next()){
-                 setVisible(false);
-                 new Home();
-             }else{
-                 JOptionPane.showMessageDialog(null, "Username hoặc password không hợp lệ");
-                 setVisible(false);
-             }
-         }catch(Exception e){
-             e.printStackTrace();
-         }
-     }
-    
+    @Override
+public void actionPerformed(ActionEvent ae) {
+    try {
+        String username = tfusername.getText().trim();
+        String password = tfpassword.getText().trim();
+        
+        // Kiểm tra nếu username hoặc password bị để trống
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ Username và Password");
+            return;
+        }
+        
+        Conn c = new Conn(); // Tạo đối tượng Conn
+        
+        // Kiểm tra nếu kết nối cơ sở dữ liệu thất bại
+        if (c.c == null) {
+            JOptionPane.showMessageDialog(null, "Không thể kết nối tới cơ sở dữ liệu");
+            return;
+        }
+
+        // Sử dụng PreparedStatement
+        String query = "SELECT * FROM login WHERE username = ? AND password = ?";
+        PreparedStatement pst = c.c.prepareStatement(query);
+        pst.setString(1, username.toLowerCase());
+        pst.setString(2, password);
+        ResultSet rs = pst.executeQuery();
+        
+        if (rs.next()) {
+            setVisible(false);
+            new Home(); // Chuyển đến trang chính nếu đăng nhập thành công
+        } else {
+            JOptionPane.showMessageDialog(null, "Username hoặc password không hợp lệ");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Lỗi hệ thống. Vui lòng thử lại sau.");
+    }
+}
+
+
     public static void main(String[] args) {
         new Login();
     }

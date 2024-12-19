@@ -1,6 +1,7 @@
 
 package employee.management.system;
 
+import com.sun.jdi.connect.spi.Connection;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.*;
@@ -143,34 +144,38 @@ public class AddEmployee extends JFrame implements ActionListener{
         setVisible(true);
     }
     
-    public void actionPerformed(ActionEvent ae) {
-        if (ae.getSource() == detail) {
-            String name = tfname.getText();
-            String dob = ((JTextField) dcdob.getDateEditor().getUiComponent()).getText();
-            String salary = tfsalary.getText();
-            String address = tfaddress.getText();
-            String phone = tfphone.getText();
-            String email = tfemail.getText();
-            String education = (String) cbeducation.getSelectedItem();
-            String designation = tfdesignation.getText();
-            String cccd = tfcccd.getText();
-            String empId = lblempId.getText();
-            
-            try {
-                Conn conn = new Conn();
-                String query = "insert into employee values('"+name+"', '"+dob+"', '"+salary+"', '"+address+"', '"+phone+"', '"+email+"', '"+education+"', '"+designation+"', '"+cccd+"', '"+empId+"')";
-                conn.s.executeUpdate(query);
-                JOptionPane.showMessageDialog(null, "Thêm thông tin nhân viên thành công");
-                setVisible(false);
-                new Home();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            setVisible(false);
-            new Home();
-        }
+
+public void actionPerformed(ActionEvent ae) {
+    if (ae.getSource() == detail) {
+    try {
+        Employee employee = new Employee();
+        employee.setTfname(tfname.getText());
+        employee.setDcdob(((JTextField) dcdob.getDateEditor().getUiComponent()).getText());
+        employee.setTfsalary(Double.parseDouble(tfsalary.getText()));
+        employee.setTfaddress(tfaddress.getText());
+        employee.setTfphone(tfphone.getText());
+        employee.setTfemail(tfemail.getText());
+        employee.setCbeducation((String) cbeducation.getSelectedItem());
+        employee.setDesignation(tfdesignation.getText());
+        employee.setTfcccd(tfcccd.getText());
+        employee.setLblempId(lblempId.getText());
+
+        Conn conn = new Conn();
+        conn.insertEmployee(employee);
+        JOptionPane.showMessageDialog(null, "Thêm nhân viên thành công!");
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Lương phải là số hợp lệ!");
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Đã xảy ra lỗi! Vui lòng thử lại.");
     }
+}
+ else {
+        setVisible(false);
+        new Home();
+    }
+}
+
 
     public static void main(String[] args){
         new AddEmployee();
